@@ -1,6 +1,4 @@
-/* ===================================
-   RESET E BASE
-=================================== */
+/* RESET E BASE */
 * {
     margin: 0;
     padding: 0;
@@ -15,39 +13,33 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    margin: 0;
-    font-family: var(--font-main);
 }
 
-/* ===================================
-   HEADER / TOGGLE DE TEMA
-=================================== */
+/* HEADER */
 .header {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
+    height: 70px;
     z-index: 1000;
     background: var(--bg);
     padding: 15px 20px;
     display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    /* centraliza o título */
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
 }
 
 .header .title {
-    font-size: 4rem; /* tamanho padrão desktop */
-    margin: 0 auto;  /* centraliza horizontalmente */
+    font-size: 4rem;
+    margin: 0;
     text-align: center;
-    white-space: nowrap; /* impede quebra de linha */
+    white-space: nowrap;
+    flex: 1;
 }
 
 .toggle-btn {
-    position: fixed;
-    top: 15px;
-    left: 15px;
     width: 42px;
     height: 42px;
     border-radius: 50%;
@@ -58,17 +50,13 @@ body {
     align-items: center;
     justify-content: center;
     transition: .3s;
-    z-index: 999;
     animation: neonBorder 6s infinite linear;
 }
 
-.toggle-btn.theme-icon {
-    position: absolute;
-    /* tiramos do fluxo flex */
-    top: 15px;
-    left: 20px;
-    width: 42px;
-    height: 42px;
+.toggle-btn.theme-icon,
+.toggle-btn.help-icon {
+    position: relative;
+    top: 0;
 }
 
 .toggle-btn:hover {
@@ -91,12 +79,9 @@ body {
     transform: rotate(-180deg);
 }
 
-/* ===================================
-   CONTAINER E TÍTULO
-=================================== */
+/* CONTAINER E TÍTULO */
 .container {
     text-align: center;
-    padding: 30px;
     animation: fadeIn 1.2s ease-in-out;
 }
 
@@ -109,24 +94,18 @@ body {
     animation: neonCycle 6s infinite linear;
 }
 
-/* =======================
-   Conteúdo principal
-======================= */
+/* MAIN CONTENT */
 .main-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding: 30px 15px;
     margin-top: 100px;
-    /* altura do header ajustada */
     margin-bottom: 60px;
 }
 
-/* ===================================
-   BOTÕES
-=================================== */
+/* BOTÕES */
 .buttons {
     display: flex;
     flex-direction: column;
@@ -146,114 +125,20 @@ body {
     border: 2px solid;
 }
 
-/* Botões Velha */
-.velha1 {
-    border-color: var(--btn-velha1);
-    color: var(--btn-velha1);
-}
+.velha1 { border-color: var(--btn-velha1); color: var(--btn-velha1); }
+.velha1:hover { background: var(--btn-velha1); color: #000; transform: scale(1.08); box-shadow: 0 0 15px var(--btn-velha1); }
 
-.velha1:hover {
-    background: var(--btn-velha1);
-    color: #000;
-    transform: scale(1.08);
-    box-shadow: 0 0 15px var(--btn-velha1);
-}
+.velha2 { border-color: var(--btn-velha2); color: var(--btn-velha2); }
+.velha2:hover { background: var(--btn-velha2); color: #000; transform: scale(1.08); box-shadow: 0 0 15px var(--btn-velha2); }
 
-.velha2 {
-    border-color: var(--btn-velha2);
-    color: var(--btn-velha2);
-}
+.velha3 { border-color: var(--btn-velha3); color: var(--btn-velha3); }
+.velha3:hover { background: var(--btn-velha3); color: #000; transform: scale(1.08); box-shadow: 0 0 15px var(--btn-velha3); }
 
-.velha2:hover {
-    background: var(--btn-velha2);
-    color: #000;
-    transform: scale(1.08);
-    box-shadow: 0 0 15px var(--btn-velha2);
-}
+.win { animation: winGlow 0.6s ease-in-out infinite; border-width: 3px; }
 
-.velha3 {
-    border-color: var(--btn-velha3);
-    color: var(--btn-velha3);
-}
-
-.velha3:hover {
-    background: var(--btn-velha3);
-    color: #000;
-    transform: scale(1.08);
-    box-shadow: 0 0 15px var(--btn-velha3);
-}
-
-/* ===================================
-   RODAPÉ
-=================================== */
-.footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    background: var(--footer-bg);
-    text-align: center;
-    padding: 15px 0;
-    font-size: 0.9rem;
-    border-top: 2px solid rgba(255, 255, 255, 0.1);
-}
-
-.neon-footer {
-    animation: neonShadow 6s infinite linear;
-}
-
-.footer a {
-    animation: neonCycle 6s infinite linear;
-    font-weight: bolder;
-}
-
-/* ===================================
-   RESPONSIVO
-=================================== */
-@media (max-width: 480px) {
-    .main-content {
-        padding: 20px 10px;
-        margin-top: 70px;
-        /* header menor em mobile */
-        margin-bottom: 50px;
-        /* footer menor em mobile */
-    }
-
-    .header .title {
-        font-size: 2rem; /* menor tamanho em telas pequenas */
-        padding: 0 50px; /* garante espaço para o botão do tema */
-    }
-
-    .toggle-btn.theme-icon {
-        top: 10px;
-        left: 10px;
-        width: 38px;
-        height: 38px;
-    }
-
-    .buttons {
-        width: 200px;
-    }
-
-    .btn {
-        font-size: 1.1rem;
-    }
-}
-
-/* ===================================
-   JOGO DA VELHA
-=================================== */
-.game-container {
-    text-align: center;
-    padding: 30px;
-    animation: fadeIn 1.2s ease-in-out;
-}
-
-.status {
-    font-size: 1.4rem;
-    margin-bottom: 20px;
-}
+/* JOGO DA VELHA */
+.game-container { text-align: center; padding: 30px; animation: fadeIn 1.2s ease-in-out; }
+.status { font-size: 1.4rem; margin-bottom: 20px; }
 
 .board {
     width: 300px;
@@ -265,7 +150,6 @@ body {
     gap: 8px;
 }
 
-/* Células */
 .cell {
     background: rgba(255, 255, 255, 0.05);
     border: 2px solid var(--neon-1);
@@ -283,81 +167,47 @@ body {
     min-height: 80px;
 }
 
-/* Bordas neutras e animação para empate */
-.board.board-neutral .cell {
-    border-color: var(--neon-1);
-    animation: neonBorder 6s infinite linear;
+.board.board-neutral .cell { border-color: var(--neon-1); animation: neonBorder 6s infinite linear; }
+
+.x-turn { color: var(--playerX); }
+.o-turn { color: var(--playerY); }
+
+.cell.x { color: var(--playerX) !important; }
+.cell.o { color: var(--playerY) !important; }
+
+.cell.x.win { border-color: var(--playerX) !important; }
+.cell.o.win { border-color: var(--playerY) !important; }
+
+.cell.filled { transform: none; }
+.board.board-x .cell { border-color: var(--playerX); }
+.board.board-o .cell { border-color: var(--playerY); }
+
+#gameStatus.x-turn { color: var(--playerX); }
+#gameStatus.o-turn { color: var(--playerY); }
+
+.controls { display: flex; justify-content: center; gap: 20px; }
+
+/* FOOTER */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background: var(--footer-bg);
+    text-align: center;
+    padding: 15px 0;
+    font-size: 0.9rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.1);
 }
 
-/* Cores X e O */
-.x-turn {
-    color: var(--playerX);
-}
+.neon-footer { animation: neonShadow 6s infinite linear; }
+.footer a { animation: neonCycle 6s infinite linear; font-weight: bolder; }
 
-.cell.x {
-    color: var(--playerX) !important;
-}
+/* BOTÃO DE AJUDA */
+.help-icon { animation: neonBorder 6s infinite linear; font-size: 1.5rem; font-weight: bold; color: var(--neon-1); }
 
-.cell.x.win {
-    border-color: var(--playerX) !important;
-}
-
-.o-turn {
-    color: var(--playerY);
-}
-
-.cell.o {
-    color: var(--playerY) !important;
-}
-
-.cell.o.win {
-    border-color: var(--playerY) !important;
-}
-
-/* Remove efeito scale de preenchimento */
-.cell.filled {
-    transform: none;
-}
-
-/* Borda dinâmica do jogador da vez */
-.board.board-x .cell {
-    border-color: var(--playerX);
-}
-
-.board.board-o .cell {
-    border-color: var(--playerY);
-}
-
-/* Texto "Vez do jogador" */
-#gameStatus.x-turn {
-    color: var(--playerX);
-}
-
-#gameStatus.o-turn {
-    color: var(--playerY);
-}
-
-.controls {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-}
-
-/* ===================================
-   BOTÃO DE AJUDA
-=================================== */
-.help-icon {
-    right: 15px;
-    left: auto;
-    animation: neonBorder 6s infinite linear;
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--neon-1);
-}
-
-/* ===================================
-   POPUP DE AJUDA
-=================================== */
+/* POPUP DE AJUDA */
 .popup-overlay {
     position: fixed;
     inset: 0;
@@ -377,27 +227,22 @@ body {
     max-width: 320px;
     border-radius: 12px;
     border: 2px solid var(--neon-1);
-    animation: fadeIn .3s ease;
+    animation: fadeIn .3s ease, neonBorder 6s infinite linear;
     text-align: left;
     box-shadow: 0 0 12px var(--neon-1);
 }
 
-.popup-content h2 {
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-}
+.popup-content h2 { margin-bottom: 10px; font-size: 1.2rem; }
+.popup-content ul { margin: 10px 0; padding-left: 18px; font-size: 1rem; line-height: 1.4; text-align: left; }
+.close-btn { margin-top: 15px; width: 100%; padding: 10px; font-size: 1.1rem; }
 
-.popup-content ul {
-    text-align: left;
-    margin: 10px 0;
-    padding-left: 18px;
-    font-size: 1rem;
-    line-height: 1.4;
-}
-
-.close-btn {
-    margin-top: 15px;
-    width: 100%;
-    padding: 10px;
-    font-size: 1.1rem;
+/* RESPONSIVO */
+@media (max-width: 700px) {
+    .main-content { padding: 20px 10px; margin-top: 70px; margin-bottom: 50px; }
+    .header { height: 60px; padding: 10px 15px; }
+    .toggle-btn.theme-icon,
+    .toggle-btn.help-icon { width: 38px; height: 38px; }
+    .header .title { font-size: 2rem; }
+    .buttons { width: 200px; }
+    .btn { font-size: 1.1rem; }
 }
