@@ -42,4 +42,15 @@
     100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-
+/* Pulsar neon (mesma ideia das bordas neon) */
+@keyframes neonPulse {
+    0% {
+        box-shadow: 0 0 5px var(--neon-1), 0 0 10px var(--neon-1);
+    }
+    50% {
+        box-shadow: 0 0 15px var(--neon-1), 0 0 25px var(--neon-1);
+    }
+    100% {
+        box-shadow: 0 0 5px var(--neon-1), 0 0 10px var(--neon-1);
+    }
+}

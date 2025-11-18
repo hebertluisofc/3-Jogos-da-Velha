@@ -137,8 +137,7 @@ body {
 .win { animation: winGlow 0.6s ease-in-out infinite; border-width: 3px; }
 
 /* JOGO DA VELHA */
-.game-container { text-align: center; padding: 30px; animation: fadeIn 1.2s ease-in-out; }
-.status { font-size: 1.4rem; margin-bottom: 20px; }
+.game-container { text-align: center; animation: fadeIn 1.2s ease-in-out; }
 
 .board {
     width: 300px;
@@ -149,6 +148,22 @@ body {
     grid-template-rows: repeat(3, 1fr);
     gap: 8px;
 }
+
+.status {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+}
+
+#timer {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--text);
+}
+
 
 .cell {
     background: rgba(255, 255, 255, 0.05);
@@ -165,6 +180,10 @@ body {
     height: 100%;
     min-width: 80px;
     min-height: 80px;
+}
+
+.selected {
+    animation: neonPulse 0.8s infinite alternate;
 }
 
 .board.board-neutral .cell { border-color: var(--neon-1); animation: neonBorder 6s infinite linear; }
