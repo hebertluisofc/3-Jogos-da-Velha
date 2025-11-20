@@ -1,133 +1,72 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Velha #3 - Em Breve</title>
-<link rel="stylesheet" href="../css/variables.css">
-<style>
-    /* RESET */
-    * { margin:0; padding:0; box-sizing:border-box; font-family:var(--font-main); }
-    body {
-        background-color: #0a0a0f; /* fundo dark */
-        overflow: hidden;
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: var(--neon-1);
-        position: relative;
-        flex-direction: column;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Velha #3</title>
 
-    /* TEXTO CENTRAL */
-    .em-breve {
-        font-size: 4rem;
-        text-align: center;
-        color: var(--neon-1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-        text-shadow: 0 0 5px var(--neon-1),
-                     0 0 10px var(--neon-2),
-                     0 0 20px var(--neon-2),
-                     0 0 40px var(--neon-3);
-        animation: neonGlow 1.5s ease-in-out infinite alternate, fadeIn 1s ease forwards;
-    }
+    <!-- CSS Global -->
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/animations.css">
+    <link rel="stylesheet" href="../css/style.css">
 
-    @keyframes neonGlow {
-        0% { text-shadow: 0 0 5px var(--neon-1),0 0 10px var(--neon-2),0 0 20px var(--neon-2),0 0 40px var(--neon-3); }
-        50% { text-shadow: 0 0 15px var(--neon-1),0 0 25px var(--neon-2),0 0 40px var(--neon-2),0 0 60px var(--neon-3); }
-        100% { text-shadow: 0 0 5px var(--neon-1),0 0 10px var(--neon-2),0 0 20px var(--neon-2),0 0 40px var(--neon-3); }
-    }
-
-    @keyframes fadeIn {
-        0% { opacity:0; transform: scale(0.8); }
-        100% { opacity:1; transform: scale(1); }
-    }
-
-    /* AMPULHETA */
-    .hourglass {
-        font-size: 3rem;
-        animation: pulse 1s infinite alternate;
-    }
-    @keyframes pulse {
-        0% { transform: scale(1); opacity:0.8; }
-        50% { transform: scale(1.2); opacity:1; }
-        100% { transform: scale(1); opacity:0.8; }
-    }
-
-    /* PARTICULAS NEON */
-    .particle {
-        position: absolute;
-        width: 4px;
-        height: 4px;
-        border-radius: 50%;
-        opacity: 0.7;
-        pointer-events: none;
-        mix-blend-mode: screen;
-        animation: float 6s infinite linear;
-    }
-
-    @keyframes float {
-        0% { transform: translateY(0) translateX(0); }
-        50% { transform: translateY(-50px) translateX(20px); }
-        100% { transform: translateY(0) translateX(0); }
-    }
-
-    /* BOTÃO VOLTAR */
-    .back-btn {
-        margin-top: 40px;
-        padding: 12px 25px;
-        font-size: 1.2rem;
-        border-radius: 10px;
-        cursor: pointer;
-        border: 2px solid var(--btn-velha1);
-        background: transparent;
-        color: var(--btn-velha1);
-        text-decoration: none;
-        transition: all 0.3s;
-        text-align: center;
-    }
-
-    .back-btn:hover {
-        background: var(--btn-velha1);
-        color: #000;
-        box-shadow: 0 0 15px var(--btn-velha1);
-        transform: scale(1.05);
-    }
-
-</style>
+    <!-- CSS específico do Velha 3 -->
+    <link rel="stylesheet" href="../css/velha3.css">
 </head>
+
 <body>
 
-<div class="em-breve">
-    <span class="hourglass">⏳</span>
-    Velha #3<br>Em Breve
-    <a href="../../index.html" class="back-btn">Voltar</a>
-</div>
+    <!-- HEADER -->
+    <header class="header">
+        <button id="themeToggle" class="toggle-btn theme-icon"></button>
+        <h1 class="title neon-led">Velha #3</h1>
+        <button id="helpBtn" class="toggle-btn help-icon">?</button>
+    </header>
 
-<script>
-    // Criar partículas flutuantes
-    const particles = [];
-    const particleCount = 80; // quantidade de partículas
-    const colors = ['var(--neon-1)','var(--neon-2)','var(--neon-3)'];
+    <!-- POPUP DE AJUDA -->
+    <div id="helpPopup" class="popup-overlay">
+        <div class="popup-content">
+            <h2>Velha #3 - Como jogar:</h2>
+            <p>• Em breve, regras especiais do Velha #3 serão mostradas aqui.</p>
+            <button id="closeHelp" class="btn velha3 close-btn">Entendi</button>
+        </div>
+    </div>
 
-    for(let i=0; i<particleCount; i++){
-        const p = document.createElement('div');
-        p.classList.add('particle');
-        p.style.left = Math.random()*100 + 'vw';
-        p.style.top = Math.random()*100 + 'vh';
-        p.style.width = (Math.random()*3+2)+'px';
-        p.style.height = p.style.width;
-        p.style.backgroundColor = colors[Math.floor(Math.random()*colors.length)];
-        p.style.animationDuration = (4 + Math.random()*4)+'s';
-        p.style.animationDelay = Math.random()*4+'s';
-        document.body.appendChild(p);
-        particles.push(p);
-    }
-</script>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <div class="main-content">
+        <main class="game-container">
+            <div class="status" id="gameStatus">
+                Vez do jogador: <span id="currentPlayerSpan" class="x-turn">X</span>
+            </div>
 
+            <div class="board" id="board">
+                <div class="cell" data-index="0"></div>
+                <div class="cell" data-index="1"></div>
+                <div class="cell" data-index="2"></div>
+                <div class="cell" data-index="3"></div>
+                <div class="cell" data-index="4"></div>
+                <div class="cell" data-index="5"></div>
+                <div class="cell" data-index="6"></div>
+                <div class="cell" data-index="7"></div>
+                <div class="cell" data-index="8"></div>
+            </div>
+
+            <div class="controls">
+                <button class="btn velha1" id="restartBtn">Reiniciar</button>
+                <button class="btn velha2" id="homeBtn">Voltar</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- RODAPÉ -->
+    <footer class="footer neon-footer">
+        Chat GPT • <a href="https://instagram.com/hebertluisoficial" target="_blank">@hebertluisoficial</a> • 2025
+    </footer>
+
+    <!-- JS Global e Velha3 -->
+    <script src="../js/global.js" defer></script>
+    <script src="../js/velha3.js" defer></script>
 </body>
+
 </html>
