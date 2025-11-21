@@ -1,19 +1,34 @@
 /* ===================================
-   assets/js/home.js - Script específico para a página home
+   assets/js/home.js - Script da Home
 =================================== */
 
 /* ============================
-   NAVEGAÇÃO ENTRE JOGOS
+   NAVEGAÇÃO ENTRE JOGOS (USANDO LOADER GLOBAL)
 ============================ */
 
+/**
+ * Abre um jogo usando o loader global.
+ */
 function openGame(num) {
-    document.getElementById("pageLoader").classList.remove("fade-out");
-    window.location.href = `assets/html/velha${num}.html`;
+    const url = `assets/html/velha${num}.html`;
+
+    // Se a função global existir, usa a navegação oficial
+    if (typeof navigateWithLoader === "function") {
+        navigateWithLoader(url);
+    }
+    else {
+        // Fallback se global.js não estiver carregado
+        const loader = document.getElementById("pageLoader");
+        loader?.classList.remove("hidden");
+        setTimeout(() => {
+            window.location.href = url;
+        }, 500);
+    }
 }
 
 
 /* ============================
-   POPUP GERAL DA HOME
+   POPUP (SOBRE / INFO)
 ============================ */
 
 const homeBtn = document.getElementById("homeBtn");
@@ -22,17 +37,17 @@ const closeAbout = document.getElementById("closeAbout");
 
 if (homeBtn && aboutPopup) {
 
-    // abrir
+    /* Abrir popup */
     homeBtn.addEventListener("click", () => {
         aboutPopup.style.display = "flex";
     });
 
-    // fechar
-    closeAbout.addEventListener("click", () => {
+    /* Fechar no botão X */
+    closeAbout?.addEventListener("click", () => {
         aboutPopup.style.display = "none";
     });
 
-    // fechar clicando fora da caixa
+    /* Fechar clicando fora */
     aboutPopup.addEventListener("click", (e) => {
         if (e.target === aboutPopup) {
             aboutPopup.style.display = "none";

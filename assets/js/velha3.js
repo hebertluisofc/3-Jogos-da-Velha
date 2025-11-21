@@ -1,39 +1,56 @@
 /* ===================================
-   assets/js/velha3.js - Script específico para o jogo da velha 3
+   assets/js/velha3.js - Jogo da Velha 3 (Ultimate Tic Tac Toe)
 =================================== */
 
-// ========================
-// ELEMENTOS DO JOGO
-// ========================
-const bigCells = document.querySelectorAll(".cell"); // células do tabuleiro grande
+/* ========================
+   1. ELEMENTOS DA INTERFACE
+   ======================== */
+const bigCells = document.querySelectorAll(".cell"); // Células do tabuleiro grande
+const homeBtn = document.getElementById("homeBtn");
+const helpBtn = document.getElementById("helpBtn");
+const helpPopup = document.getElementById("helpPopup");
+const closeHelp = document.getElementById("closeHelp");
 
-// ========================
-// CRIAR TABULEIROS PEQUENOS
-// ========================
-bigCells.forEach((bigCell, bigIndex) => {
-    const smallBoard = document.createElement("div");
-    smallBoard.classList.add("small-board");
+/* ========================
+   2. EVENTOS
+   ======================== */
 
-    for (let i = 0; i < 9; i++) {
-        const smallCell = document.createElement("div");
-        smallCell.classList.add("small-cell");
-        smallCell.dataset.index = i;
-        smallCell.dataset.bigIndex = bigIndex; // para saber qual tabuleiro grande pertence
-        smallBoard.appendChild(smallCell);
-    }
-
-    bigCell.appendChild(smallBoard);
+// Popup de ajuda
+window.addEventListener("load", () => {
+    helpPopup.style.display = "flex";
 });
 
-/* ============================
-   BOTÃO VOLTAR PARA A HOME
-============================ */
+helpBtn.addEventListener("click", () => helpPopup.style.display = "flex");
+closeHelp.addEventListener("click", () => helpPopup.style.display = "none");
 
-const homeBtn = document.getElementById("homeBtn");
+helpPopup.addEventListener("click", e => {
+    if (e.target === helpPopup) helpPopup.style.display = "none";
+});
 
+// Botão Home
 if (homeBtn) {
     homeBtn.addEventListener("click", () => {
         window.location.href = "../../index.html";
     });
 }
 
+/* ========================
+   3. CRIAÇÃO DOS TABULEIROS
+   ======================== */
+bigCells.forEach((bigCell, bigIndex) => {
+
+    const smallBoard = document.createElement("div");
+    smallBoard.classList.add("small-board");
+
+    for (let i = 0; i < 9; i++) {
+        const smallCell = document.createElement("div");
+        smallCell.classList.add("small-cell");
+
+        smallCell.dataset.index = i;      // Índice da célula dentro do tabuleiro pequeno
+        smallCell.dataset.bigIndex = bigIndex; // Índice do tabuleiro grande que pertence
+
+        smallBoard.appendChild(smallCell);
+    }
+
+    bigCell.appendChild(smallBoard);
+});
