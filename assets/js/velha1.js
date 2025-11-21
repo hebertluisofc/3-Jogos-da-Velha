@@ -1,3 +1,7 @@
+/* ===================================
+   assets/js/velha1.js - Script específico para o jogo da velha 1
+=================================== */
+
 // ========================
 // ELEMENTOS DA INTERFACE
 // ========================
