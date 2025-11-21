@@ -3,8 +3,10 @@
 ============================ */
 
 function openGame(num) {
+    document.getElementById("pageLoader").classList.remove("fade-out");
     window.location.href = `assets/html/velha${num}.html`;
 }
+
 
 /* ============================
    POPUP GERAL DA HOME

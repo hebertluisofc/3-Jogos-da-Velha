@@ -89,3 +89,34 @@ if (canvas) {
         canvas.height = window.innerHeight;
     });
 }
+
+/* ============================
+   LOADER ENTRE PÁGINAS
+============================ */
+
+const loader = document.getElementById("pageLoader");
+
+// Remove o loader após carregar
+window.addEventListener("load", () => {
+    setTimeout(() => loader.classList.add("hidden"), 300);
+});
+
+// Função para transição ao trocar de páginas
+function navigateWithLoader(url) {
+    loader.classList.remove("hidden");
+    setTimeout(() => {
+        window.location.href = url;
+    }, 500); // tempo da animação de saída
+}
+
+// Intercepta botões "Voltar", "Home", "Velha"
+document.addEventListener("click", (e) => {
+    const target = e.target;
+
+    // Qualquer elemento com atributo data-nav
+    if (target.matches("[data-nav]")) {
+        e.preventDefault();
+        const url = target.getAttribute("data-nav");
+        navigateWithLoader(url);
+    }
+});

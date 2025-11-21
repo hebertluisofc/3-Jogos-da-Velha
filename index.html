@@ -10,9 +10,14 @@
     <link rel="stylesheet" href="assets/css/variables.css">
     <link rel="stylesheet" href="assets/css/animations.css">
     <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/loader.css">
 </head>
 
 <body class="dark">
+
+    <div id="pageLoader" class="loader-overlay">
+        <div class="loader-hash">#</div>
+    </div>
 
     <canvas id="particlesCanvas"></canvas>
 
@@ -42,14 +47,12 @@
         </div>
     </div>
 
-
-
     <div class="main-content">
         <main class="container">
             <div class="buttons">
-                <button class="btn velha1" onclick="openGame(1)">Velha #1</button>
-                <button class="btn velha2" onclick="openGame(2)">Velha #2</button>
-                <button class="btn velha3" onclick="openGame(3)">Velha #3</button>
+                <button class="btn velha1" data-nav="assets/html/velha1.html">Velha #1</button>
+                <button class="btn velha2" data-nav="assets/html/velha2.html">Velha #2</button>
+                <button class="btn velha3" data-nav="assets/html/velha3.html">Velha #3</button>
             </div>
         </main>
     </div>
