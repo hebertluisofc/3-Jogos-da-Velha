@@ -9,7 +9,6 @@
 const toggleBtn = document.getElementById("themeToggle");
 const body = document.body;
 
-/* Se existir toggle na página */
 if (toggleBtn) {
 
     const savedTheme = localStorage.getItem("theme") || "dark";
