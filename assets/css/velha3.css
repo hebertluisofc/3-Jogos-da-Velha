@@ -21,6 +21,7 @@
     justify-content: center;
     border-radius: 10px;
     padding: 4px;
+    border: none;
 }
 
 /* Tabuleiro pequeno dentro de cada célula do grande */
@@ -53,14 +54,14 @@
 /* Tabuleiro ativo do jogador X */
 .active-board-x {
     animation: neonShadow 6s infinite linear;
+    border: 3px solid;
     border-color: var(--playerX) !important;
-    border-width: 3px;
 }
 
 /* Tabuleiro ativo do jogador O */
 .active-board-o {
     animation: neonShadow 6s infinite linear;
+    border: 3px solid;
     border-color: var(--playerY) !important;
-    border-width: 3px;
 }
 

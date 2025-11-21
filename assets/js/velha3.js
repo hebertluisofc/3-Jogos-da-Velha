@@ -106,13 +106,14 @@ bigBoards.forEach((smallBoard, bigIndex) => {
 /* ========================
    6b. HOVER DINÂMICO PARA CÉLULAS PEQUENAS
 ======================== */
-bigBoards.forEach(smallBoard => {
+bigBoards.forEach((smallBoard, bigIndex) => {
     const smallCells = smallBoard.querySelectorAll(".small-cell");
 
     smallCells.forEach(cell => {
         cell.addEventListener("mouseenter", () => {
             if (!running) return;
             if (cell.textContent !== "") return; // não altera hover se célula preenchida
+            if (activeBigIndex !== null && activeBigIndex !== bigIndex) return; // só hover se tabuleiro ativo
 
             // Aplica cor do jogador da vez
             cell.style.background = currentPlayer === "X" 
