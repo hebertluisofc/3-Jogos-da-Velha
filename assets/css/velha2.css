@@ -38,9 +38,9 @@
 
 /* Range */
 #timerRange {
-    -webkit-appearance: none; /* Chrome, Safari */
-    -moz-appearance: none;    /* Firefox */
-    appearance: none;         /* padrão moderno */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 
     width: 70px;
     height: 10px;
