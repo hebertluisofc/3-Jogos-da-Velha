@@ -38,15 +38,17 @@
 
 /* Range */
 #timerRange {
-    -webkit-appearance: none;
+    -webkit-appearance: none; /* Chrome, Safari */
+    -moz-appearance: none;    /* Firefox */
+    appearance: none;         /* padrão moderno */
+
     width: 70px;
     height: 10px;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 10px;
     cursor: pointer;
     transition: background 0.3s;
 }
-
 #timerRange::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
