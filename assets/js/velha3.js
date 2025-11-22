@@ -1,12 +1,12 @@
 /* ===================================
    assets/js/velha3.js - Jogo da Velha 3 (Ultimate Tic Tac Toe)
-   Versão reorganizada, com verificação de vitória grande + destaque
+   Versão corrigida: UNDO reverte apenas 1 jogada (limite 4)
 =================================== */
 
 /* ========================
-   0. QUERY SELECTORS (cache)
+   0. QUERY SELECTORS
 ======================== */
-const bigCells = Array.from(document.querySelectorAll(".cell")); // 9 células grandes
+const bigCells = Array.from(document.querySelectorAll(".cell"));
 const homeBtn = document.getElementById("homeBtn");
 const restartBtn = document.getElementById("restartBtn");
 const helpBtn = document.getElementById("helpBtn");
@@ -19,13 +19,13 @@ const statusText = document.getElementById("gameStatus");
 ======================== */
 let currentPlayer = "X";
 let running = true;
-let activeBigIndex = null; // null = qualquer tabuleiro no início
+let activeBigIndex = null;
 
-// small boards DOM references (criadas dinamicamente)
 let bigBoards = [];
-
-// finishedBoards: null = jogável | "X" | "O" = vencedor do tabuleiro grande
 let finishedBoards = Array(9).fill(null);
+
+const stateStack = [];
+const MAX_HISTORY = 4;
 
 /* ========================
    2. INICIALIZAÇÃO
@@ -34,16 +34,21 @@ function init() {
     createSmallBoards();
     bindUI();
     bindBoardEvents();
+
+    // snapshot inicial (tabuleiro limpo)
+    pushSnapshot();
+
+    updateUndoButton();
     updateActiveBoard();
+
     if (helpPopup) helpPopup.style.display = "flex";
 }
 
 /* ========================
-   3. CRIAÇÃO DINÂMICA DOS TABULEIROS MENORES
+   3. CRIAÇÃO DOS TABULEIROS PEQUENOS
 ======================== */
 function createSmallBoards() {
     bigBoards = bigCells.map((bigCell, bigIndex) => {
-        // se já existir small-board (recarregar), remove para evitar duplicação
         const existing = bigCell.querySelector(".small-board");
         if (existing) existing.remove();
 
@@ -51,13 +56,11 @@ function createSmallBoards() {
         smallBoard.classList.add("small-board");
 
         for (let i = 0; i < 9; i++) {
-            const smallCell = document.createElement("div");
-            smallCell.classList.add("small-cell");
-
-            smallCell.dataset.index = i; // índice no pequeno
-            smallCell.dataset.bigIndex = bigIndex; // índice do grande
-
-            smallBoard.appendChild(smallCell);
+            const sc = document.createElement("div");
+            sc.classList.add("small-cell");
+            sc.dataset.index = i;
+            sc.dataset.bigIndex = bigIndex;
+            smallBoard.appendChild(sc);
         }
 
         bigCell.appendChild(smallBoard);
@@ -66,29 +69,45 @@ function createSmallBoards() {
 }
 
 /* ========================
-   4. BIND UI (buttons, popups)
+   4. BIND UI E BOTÃO UNDO
 ======================== */
 function bindUI() {
-    // help popup
     window.addEventListener("load", () => { if (helpPopup) helpPopup.style.display = "flex"; });
 
     helpBtn?.addEventListener("click", () => { if (helpPopup) helpPopup.style.display = "flex"; });
     closeHelp?.addEventListener("click", () => { if (helpPopup) helpPopup.style.display = "none"; });
     helpPopup?.addEventListener("click", e => { if (e.target === helpPopup) helpPopup.style.display = "none"; });
 
-    // home
-    if (homeBtn) {
-        homeBtn.addEventListener("click", () => window.location.href = "../../index.html");
+    if (homeBtn) homeBtn.addEventListener("click", () => window.location.href = "../../index.html");
+    if (restartBtn) restartBtn.addEventListener("click", restartGame);
+
+    let undoBtn = document.getElementById("undoBtn");
+    if (!undoBtn) {
+        const controls = document.querySelector(".controls");
+        if (controls) {
+            undoBtn = document.createElement("button");
+            undoBtn.id = "undoBtn";
+            undoBtn.className = "btn velha3";
+            undoBtn.textContent = "Desfazer";
+            const restartEl = document.getElementById("restartBtn");
+            const homeEl = document.getElementById("homeBtn");
+            if (restartEl && homeEl && restartEl.parentNode === homeEl.parentNode) {
+                restartEl.parentNode.insertBefore(undoBtn, homeEl);
+            } else {
+                controls.appendChild(undoBtn);
+            }
+        }
     }
 
-    // restart
-    if (restartBtn) {
-        restartBtn.addEventListener("click", restartGame);
+    if (undoBtn) {
+        undoBtn.disabled = true;
+        undoBtn.addEventListener("click", undoSnapshot);
+        // efeito visual de fade (CSS assume que .btn pode ficar disabled)
     }
 }
 
 /* ========================
-   5. LÓGICA: VITÓRIA NO TABULEIRO MENOR
+   5. VITÓRIA NO TABULEIRO PEQUENO
    Retorna "X", "O" ou null
 ======================== */
 function determineSmallWinner(bigIndex) {
@@ -96,43 +115,124 @@ function determineSmallWinner(bigIndex) {
     const cells = Array.from(board.querySelectorAll(".small-cell")).map(c => c.textContent);
 
     const wins = [
-        [0,1,2], [3,4,5], [6,7,8],
-        [0,3,6], [1,4,7], [2,5,8],
-        [0,4,8], [2,4,6]
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
     ];
 
     for (const [a,b,c] of wins) {
-        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) {
-            return cells[a]; // "X" ou "O"
-        }
+        if (cells[a] && cells[a] === cells[b] && cells[a] === cells[c]) return cells[a];
     }
 
-    // return null; full-board "penúltimo wins" is handled by caller
     return null;
 }
 
 /* ========================
-   6. MARCAR TABULEIRO GRANDE (overlay) E VISUAL
+   6. MARCAR TABULEIRO GRANDE
 ======================== */
 function markBigBoardWinner(bigIndex, winner) {
     const bigCell = bigCells[bigIndex];
     if (!bigCell) return;
-    if (bigCell.querySelector(".winner-overlay")) return; // já marcado
+    if (bigCell.querySelector(".winner-overlay")) return;
 
-    // overlay texto
     const overlay = document.createElement("div");
     overlay.classList.add("winner-overlay");
     overlay.textContent = winner;
     overlay.style.color = winner === "X" ? "var(--playerX)" : "var(--playerY)";
     bigCell.appendChild(overlay);
 
-    // marca estado
     bigCell.classList.add("board-finished");
     finishedBoards[bigIndex] = winner;
 }
 
 /* ========================
-   7. EVENT HANDLER: clique em célula pequena
+   7. SALVAR SNAPSHOT (depois da jogada)
+   Guarda pequeno estado, finishedBoards, jogador atual, flags
+======================== */
+function pushSnapshot() {
+    const smallCellsState = bigBoards.map(board =>
+        Array.from(board.querySelectorAll(".small-cell")).map(c => c.textContent)
+    );
+
+    const snapshot = {
+        smallCellsState,
+        finishedBoards: finishedBoards.slice(),
+        currentPlayer,
+        running,
+        activeBigIndex
+    };
+
+    stateStack.push(snapshot);
+
+    if (stateStack.length > MAX_HISTORY) stateStack.shift();
+
+    updateUndoButton();
+}
+
+/* ========================
+   8. RESTAURAR SNAPSHOT
+======================== */
+function applySnapshot(snapshot) {
+    if (!snapshot) return;
+
+    snapshot.smallCellsState.forEach((boardState, bigIndex) => {
+        const board = bigBoards[bigIndex];
+        const cells = Array.from(board.querySelectorAll(".small-cell"));
+        cells.forEach((cell, idx) => {
+            cell.textContent = boardState[idx] || "";
+            if (cell.textContent === "X") cell.style.color = "var(--playerX)";
+            else if (cell.textContent === "O") cell.style.color = "var(--playerY)";
+            else cell.style.color = "";
+            cell.style.background = "";
+            cell.style.transform = "";
+        });
+    });
+
+    finishedBoards = snapshot.finishedBoards.slice();
+
+    bigCells.forEach((bigCell, idx) => {
+        const overlay = bigCell.querySelector(".winner-overlay");
+        if (overlay) overlay.remove();
+        bigCell.classList.remove("board-finished", "win");
+
+        if (finishedBoards[idx]) {
+            const ov = document.createElement("div");
+            ov.classList.add("winner-overlay");
+            ov.textContent = finishedBoards[idx];
+            ov.style.color = finishedBoards[idx] === "X" ? "var(--playerX)" : "var(--playerY)";
+            bigCell.appendChild(ov);
+            bigCell.classList.add("board-finished");
+        }
+    });
+
+    currentPlayer = snapshot.currentPlayer;
+    running = snapshot.running;
+    activeBigIndex = snapshot.activeBigIndex;
+
+    clearBigWinHighlights();
+    updateActiveBoard();
+}
+
+/* ========================
+   9. DESFAZER ÚLTIMA JOGADA
+   (pop e aplica - mantém sempre pelo menos 1 snapshot inicial)
+======================== */
+function undoSnapshot() {
+    if (stateStack.length <= 1) return;
+
+    // remove o snapshot mais recente (estado *após* a última jogada)
+    stateStack.pop();
+
+    // aplica o novo topo (estado imediatamente anterior)
+    const previous = stateStack[stateStack.length - 1];
+    applySnapshot(previous);
+
+    updateUndoButton();
+}
+
+/* ========================
+   10. MANIPULADOR DE CLIQUE (pequena célula)
+   Nota: agora grava snapshot APÓS a mutação — garante undo = 1 jogada
 ======================== */
 function handleSmallCellClick(evt) {
     if (!running) return;
@@ -141,74 +241,61 @@ function handleSmallCellClick(evt) {
     const bigIndex = Number(cell.dataset.bigIndex);
     const smallIndex = Number(cell.dataset.index);
 
-    // bloqueios iniciais
     if (finishedBoards[bigIndex] !== null) return;
     if (activeBigIndex !== null && activeBigIndex !== bigIndex) return;
     if (cell.textContent !== "") return;
 
-    // joga
+    // aplica jogada
     const playerWhoPlayed = currentPlayer;
     cell.textContent = playerWhoPlayed;
     cell.style.color = playerWhoPlayed === "X" ? "var(--playerX)" : "var(--playerY)";
 
-    // verifica vitória clássica no pequeno
+    // checa vitória clássica no pequeno
     const smallWin = determineSmallWinner(bigIndex);
 
-    // determina vencedor do pequeno (incluindo regra do penúltimo)
     let winner = null;
-    if (smallWin === "X" || smallWin === "O") {
+    if (smallWin) {
         winner = smallWin;
     } else {
-        // se o pequeno ficou cheio, penúltimo vence
         const cellsNow = Array.from(bigBoards[bigIndex].querySelectorAll(".small-cell"));
         const full = cellsNow.every(c => c.textContent !== "");
-        if (full) {
-            winner = playerWhoPlayed === "X" ? "O" : "X";
-        }
+        if (full) winner = playerWhoPlayed === "X" ? "O" : "X";
     }
 
-    // se há vencedor no pequeno, marca e checa vitória grande
     if (winner && finishedBoards[bigIndex] === null) {
         markBigBoardWinner(bigIndex, winner);
-        // checar vitória grande (linha ou maioria)
         const bigResult = checkBigBoardVictory();
-        if (bigResult) {
-            // se houve finalização por linha, highlight já aplicado em checkBigBoardVictory()
-            // endGame será chamado ali
-            return;
-        }
+        // se terminou a partida, gravamos snapshot também (estado final)
+        // mas deixamos o comportamento normal: continuar para pushSnapshot abaixo
     }
 
-    // define próximo tabuleiro ativo
+    // define próximo tabuleiro
     const nextBoard = smallIndex;
     activeBigIndex = (finishedBoards[nextBoard] !== null) ? null : nextBoard;
 
     // alterna jogador
     currentPlayer = currentPlayer === "X" ? "O" : "X";
 
+    // gravar snapshot do estado resultante dessa jogada (IMPORTANT: depois da mutação)
+    pushSnapshot();
+
     updateActiveBoard();
 }
 
 /* ========================
-   8. BIND EVENTOS NAS CÉLULAS PEQUENAS (hover + click)
+   11. BIND EVENTOS NAS PEQUENAS CÉLULAS
 ======================== */
 function bindBoardEvents() {
     bigBoards.forEach((smallBoard, bigIndex) => {
         const smallCells = smallBoard.querySelectorAll(".small-cell");
 
-        smallCells.forEach(cell => {
-            // remover listeners duplicate (se reiniciar)
-            cell.replaceWith(cell.cloneNode(true));
-        });
+        smallCells.forEach(cell => cell.replaceWith(cell.cloneNode(true)));
 
-        // re-query after cloneNode
-        const freshCells = smallBoard.querySelectorAll(".small-cell");
+        const fresh = smallBoard.querySelectorAll(".small-cell");
 
-        freshCells.forEach(cell => {
-            // click
+        fresh.forEach(cell => {
             cell.addEventListener("click", handleSmallCellClick);
 
-            // hover (condicional: só quando ativo e não finalizado)
             cell.addEventListener("mouseenter", () => {
                 if (!running) return;
                 if (cell.textContent !== "") return;
@@ -216,13 +303,13 @@ function bindBoardEvents() {
                 if (activeBigIndex !== null && activeBigIndex !== bigIndex) return;
 
                 cell.style.background = currentPlayer === "X"
-                    ? "rgba(0, 255, 255, 0.2)"
-                    : "rgba(255, 0, 255, 0.2)";
+                    ? "rgba(0,255,255,0.2)"
+                    : "rgba(255,0,255,0.2)";
                 cell.style.transform = "scale(1.05)";
             });
 
             cell.addEventListener("mouseleave", () => {
-                cell.style.background = "rgba(255, 255, 255, 0.1)";
+                cell.style.background = "rgba(255,255,255,0.1)";
                 cell.style.transform = "scale(1)";
             });
         });
@@ -230,143 +317,124 @@ function bindBoardEvents() {
 }
 
 /* ========================
-   9. CHECAR VITÓRIA NO TABULEIRO GRANDE
-   - retorna winner ("X" or "O") se finalizado, ou null
-   - aplica destaques visuais na linha vencedora (classe .win aplicada aos 3 bigCells)
-   - se nenhum linha e todos finalizados => decide por maioria e aplica destaque a todos tabuleiros do vencedor
+   12. VITÓRIA NO TABULEIRO GRANDE
 ======================== */
 function checkBigBoardVictory() {
     const wins = [
-        [0,1,2], [3,4,5], [6,7,8],
-        [0,3,6], [1,4,7], [2,5,8],
-        [0,4,8], [2,4,6]
+        [0,1,2],[3,4,5],[6,7,8],
+        [0,3,6],[1,4,7],[2,5,8],
+        [0,4,8],[2,4,6]
     ];
 
-    // 1) checar vitória clássica (linha)
     for (const [a,b,c] of wins) {
-        if (finishedBoards[a] && finishedBoards[a] === finishedBoards[b] && finishedBoards[a] === finishedBoards[c]) {
-            const winner = finishedBoards[a];
+        if (finishedBoards[a] &&
+            finishedBoards[a] === finishedBoards[b] &&
+            finishedBoards[a] === finishedBoards[c]) {
 
-            // aplicar destaque de vitória apenas nos 3 tabuleiros da linha
+            const winner = finishedBoards[a];
             clearBigWinHighlights();
             [a,b,c].forEach(i => bigCells[i].classList.add("win"));
-
-            // finalizar jogo
-            endGame(winner, `Jogador ${winner} venceu por linha!`);
+            endGame(winner);
             return winner;
         }
     }
 
-    // 2) se ainda existir tabuleiro não finalizado, não decide por pontos
     if (finishedBoards.includes(null)) return null;
 
-    // 3) todos finalizados → decide por maioria de pontos
-    const countX = finishedBoards.filter(v => v === "X").length;
-    const countO = finishedBoards.filter(v => v === "O").length;
+    const x = finishedBoards.filter(v => v === "X").length;
+    const o = finishedBoards.filter(v => v === "O").length;
 
-    const winner = countX > countO ? "X" : "O";
+    const winner = x > o ? "X" : "O";
 
-    // destacar todos os tabuleiros vencidos pelo vencedor
     clearBigWinHighlights();
-    finishedBoards.forEach((v, idx) => {
-        if (v === winner) bigCells[idx].classList.add("win");
-    });
+    finishedBoards.forEach((v, i) => { if (v === winner) bigCells[i].classList.add("win"); });
 
-    endGame(winner, `Jogador ${winner} venceu por maioria (${countX} × ${countO})!`);
+    endGame(winner);
     return winner;
 }
 
 /* ========================
-   10. REMOVER DESTAQUES DE VITÓRIA GRANDES
+   13. LIMPAR DESTAQUES
 ======================== */
 function clearBigWinHighlights() {
     bigCells.forEach(c => c.classList.remove("win"));
 }
 
 /* ========================
-   11. FINALIZA JOGO: atualiza status e bloqueia jogadas
-   - message é opcional (texto exibido)
+   14. FINALIZAÇÃO
 ======================== */
-function endGame(winner, message) {
+function endGame(winner) {
     running = false;
     activeBigIndex = null;
-
-    // remover highlights de tabuleiro ativo
     bigCells.forEach(c => c.classList.remove("active-board-x", "active-board-o"));
 
-    // Mostrar mensagem no status (estilizada pela classe x-turn / o-turn)
     if (statusText) {
-        if (message) {
-            statusText.innerHTML = `<span class="${winner === "X" ? "x-turn" : "o-turn"}">${message}</span>`;
-        } else {
-            statusText.innerHTML = `<span class="${winner === "X" ? "x-turn" : "o-turn"}">Jogador ${winner} venceu a partida!</span>`;
-        }
+        statusText.innerHTML = `<span class="${winner === "X" ? "x-turn" : "o-turn"}">Jogador ${winner} venceu!</span>`;
     }
 }
 
 /* ========================
-   12. ATUALIZAÇÃO DO TABULEIRO ATIVO (bordas)
+   15. ATUALIZAÇÃO DO TABULEIRO ATIVO
 ======================== */
 function updateActiveBoard() {
     bigCells.forEach((bigCell, index) => {
         bigCell.classList.remove("active-board-x", "active-board-o");
-
         if (!running) return;
         if (finishedBoards[index] !== null) return;
-
         if (activeBigIndex === null || activeBigIndex === index) {
             bigCell.classList.add(currentPlayer === "X" ? "active-board-x" : "active-board-o");
         }
     });
 
-    if (statusText) {
+    if (statusText && running) {
         statusText.innerHTML = `Vez do jogador: <span class="${currentPlayer === "X" ? "x-turn" : "o-turn"}">${currentPlayer}</span>`;
     }
 }
 
 /* ========================
-   13. REINICIAR PARTIDA (RESET LIMPO)
+   16. ATUALIZAR BOTÃO UNDO
+======================== */
+function updateUndoButton() {
+    const undoBtn = document.getElementById("undoBtn");
+    if (!undoBtn) return;
+    undoBtn.disabled = stateStack.length <= 1;
+}
+
+/* ========================
+   17. REINICIAR PARTIDA
 ======================== */
 function restartGame() {
-    // limpa pequenas
-    bigBoards.forEach(smallBoard => {
-        smallBoard.querySelectorAll(".small-cell").forEach(cell => {
-            cell.textContent = "";
-            cell.style.color = "";
-            cell.style.background = "";
-            cell.style.transform = "";
-        });
-    });
+    bigBoards.forEach(board =>
+        board.querySelectorAll(".small-cell").forEach(c => {
+            c.textContent = "";
+            c.style.color = "";
+            c.style.background = "";
+            c.style.transform = "";
+        })
+    );
 
-    // remove overlays e classes de status nos grandes
     bigCells.forEach(c => {
-        // remove overlay
         const overlay = c.querySelector(".winner-overlay");
         if (overlay) overlay.remove();
-
-        // remove finished & win classes
         c.classList.remove("board-finished", "win", "active-board-x", "active-board-o");
-
-        // restart animação (sincronizar)
-        c.style.animation = "none";
-        void c.offsetWidth; // force reflow
-        c.style.animation = "";
     });
 
-    // reset estado
     currentPlayer = "X";
     running = true;
     activeBigIndex = null;
     finishedBoards = Array(9).fill(null);
 
-    // recriar small boards and rebind events (safe)
+    stateStack.length = 0;
+    pushSnapshot();
+
     createSmallBoards();
     bindBoardEvents();
 
+    updateUndoButton();
     updateActiveBoard();
 }
 
 /* ========================
-   14. START
+   18. START
 ======================== */
 init();

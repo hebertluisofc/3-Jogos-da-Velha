@@ -91,3 +91,14 @@
     text-shadow: 0 0 18px currentColor;
 }
 
+#undoBtn {
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    opacity: 1;
+    transform: scale(1);
+}
+
+#undoBtn:disabled {
+    opacity: 0.3;
+    transform: scale(0.92);
+    pointer-events: none;
+}
