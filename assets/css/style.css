@@ -299,9 +299,7 @@ body::before {
     box-shadow: 0 0 12px var(--neon-1);
     text-align: left;
     animation: fadeIn .3s ease, neonBorder 6s infinite linear;
-
     max-height: 80vh;
-    /* overflow removido daqui, será no wrapper interno */
 }
 
 /* WRAPPER INTERNO PARA O SCROLL */
@@ -361,10 +359,14 @@ body::before {
 }
 
 .close-btn {
-    margin-top: 15px;
-    width: 95%;
+    margin-top: 10px;
+    width: 90%;
     padding: 10px;
     font-size: 1.1rem;
+}
+
+.popup-scroll-wrapper .close-btn {
+    margin-left: 20px;
 }
 
 /* RESPONSIVE */
