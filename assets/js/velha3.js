@@ -25,7 +25,7 @@ let bigBoards = [];
 let finishedBoards = Array(9).fill(null);
 
 const stateStack = [];
-const MAX_HISTORY = 4;
+const MAX_HISTORY = 4; // Limite de 3 estados salvos para desfazer
 
 /* ========================
    2. INICIALIZAÇÃO
