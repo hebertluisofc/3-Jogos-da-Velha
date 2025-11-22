@@ -286,7 +286,7 @@ function checkWinner(player) {
 function endGameByTimeout() {
     running = false;
     const colorClass = currentPlayer==="X"?"x-turn":"o-turn";
-    statusText.innerHTML = `Jogador <span class="${colorClass}">${currentPlayer}</span> perdeu por tempo!`;
+    statusText.innerHTML = `Jogador <span class="${colorClass}">${currentPlayer}</span> perdeu!`;
 }
 
 /* ========================
