@@ -121,6 +121,11 @@ function markBigBoard(bigCell, winner) {
     overlay.classList.add("winner-overlay");
     overlay.textContent = winner;
 
+    // COR DO JOGADOR
+    overlay.style.color = winner === "X"
+        ? "var(--playerX)"
+        : "var(--playerY)";
+
     bigCell.appendChild(overlay);
     bigCell.classList.add("board-finished");
 }

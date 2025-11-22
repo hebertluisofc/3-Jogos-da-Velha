@@ -65,21 +65,29 @@
     border-color: var(--playerY) !important;
 }
 
+/* --- Remover a transparência do big cell inteiro --- */
 .board-finished {
     position: relative;
-    opacity: 0.4; /* tabuleiro menor mais fraco */
 }
 
+/* --- Aplicar a transparência APENAS no tabuleiro menor --- */
+.board-finished .small-board {
+    opacity: 0.35;
+}
+
+/* --- Overlay sempre 100% opaco e colorido --- */
 .winner-overlay {
     position: absolute;
     inset: 0;
-    font-size: 4rem;
+    font-size: 4.2rem;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: bold;
     pointer-events: none;
-    color: white;
-    text-shadow: 0 0 15px currentColor;
+
+    opacity: 1; /* garantir que fique sólido */
+    color: white; /* cor padrão, será sobrescrita via JS */
+    text-shadow: 0 0 18px currentColor;
 }
 
