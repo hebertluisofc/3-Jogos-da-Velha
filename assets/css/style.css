@@ -1,6 +1,5 @@
 /* ===================================
    assets/css/style.css - TicTacThree
-   Refatorado, organizado e otimizado
 =================================== */
 
 /* RESET & BASE */
@@ -225,7 +224,26 @@ body::before {
 #gameStatus.x-turn { color: var(--playerX); }
 #gameStatus.o-turn { color: var(--playerY); }
 
-.controls { display: flex; justify-content: center; gap: 20px; }
+/* ===============================
+   CONTROLES DINÂMICOS
+=============================== */
+
+.controls {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;          
+    width: 100%;          
+    max-width: 100%;     
+    margin: 0 auto;       
+}
+
+.controls .btn {
+    flex: 1;
+    padding: 12px 10px;
+    font-size: 0.80rem;
+    border-radius: 10px;
+    text-align: center;
+}
 
 /* FOOTER */
 .footer {
